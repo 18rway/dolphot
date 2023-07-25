@@ -1,29 +1,32 @@
 # dolphot
 This readme will outline the necessary steps to run dolphot for JWST images with any detector. All steps should be run in the terminal.
 First, begin by downloading dolphot: http://americano.dolphinsim.com/dolphot/
-Download the dolphot2.0 base sources, and then download the MIRI,NIRCAM and NIRISS sources. Additionally download the manual for clarity. Once all the tar files are downloaded and unpacked, place all 3 detector subdirectories into the dolphot2.0 overall directory using, for example:
+
+Download the dolphot2.0 base sources, and then download the MIRI,NIRCAM and NIRISS software. The downloads will contains manuals which outline many of the steps I will go through here. Once all the tar files are downloaded and unpacked, place all 3 detector subdirectories into the dolphot2.0 overall directory using, for example:
 ```
 mv ~/dolphot2.0_2/miri ~/dolphot2.0
 ```
-Ensure al subdirectories for the detectors are in the larger dolphot directory.
+Ensure all subdirectories for the detectors are in the larger dolphot directory.
 Uncomment all 3 definitions for MIRI,NIRCAM and NIRISS in the makefile by simply opening it and using a preferred text editor.
 Now, run the make file from the dolphot2.0 subdirectory simply by running make. Everything should run without errors. If something fails, check the manual or reach out to Andy Dolphin(he is quite responsive) at adolphin@raytheon.com
 Now, that everything is downloaded, you can set the path so that one can properly run dolphot from the terminal. Edit your bashrc file to contain the following:
-example:
 ```
 export PATH=~/dolphot2.0/bin:$PATH
 ```
 Now you can begin to work with dolphot. The great advantage of dolphot is that you can run across many images simaultaneously, and dolphot will treat each image separately and give separate results. However, for this example, let us simply assume we are using a single calibrated(level 2) image. Adding images simply requires a tweak to the parameter file. Download images from: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
-Once you have your images downloaded, you must run the appropriate masking step, which masks pixels or convers them to a usable format for dolphot, depending on the detector. For this step, if one was working with a nircam image which we assume is in some directory on our computer, you would run:
+Once you have your images downloaded, you must run the appropriate masking step, which masks pixels or converts them to a usable format for dolphot, depending on the detector. For this step, if one was working with a nircam image which we assume is in some directory on our computer, you would run:
 ```
 ls
 jw02767002001_02103_00001_nrcb3_cal.fits
 nircammask *.fits >>phot.log
 ```
-Ensure you make a copy of the image, as the masking step alters the image. This would mask the image and then create a log file to keep track of any potential errors and your progress.
+Ensure you make a copy of the image, as the masking step alters the image. This step will mask the image and then create a log file to keep track of any potential errors in the ouput and your progress.
 Following this, it is best practice to ensure that there is only one science chip you will be running dolphot on(dolphot will not run on multi-chip images-you need to separate and run on each chip) by running splitgroups
 ```
 splitgroups *.fits >>phot.log
+ls
+jw02767002001_02103_00001_nrcb3_cal.chip1.fits
+jw02767002001_02103_00001_nrcb3_cal.fits
 ```
 Now, we must create a sky map for dolphot to use for each image and each chip. To do this, we run calcsky, which uses multiple parameters:
 
@@ -42,11 +45,11 @@ calcsky jw02767002001_02103_00001_nrcb3_cal 10 25 4 2.25 2.00 >>phot.log
 ls
 jw02767002001_02103_00001_nrcb3_cal.fits jw02767002001_02103_00001_nrcb3_cal.chip1.fits jw02767002001_02103_00001_nrcb3_cal.chip1.sky.fits
 ```
-Now we can proceed to running the multi-pass photometry stuff. However, we must ensure we have the proper PSFs for dolphot to read to do PSF photometry. We downloaded the psfs again from http://americano.dolphinsim.com/dolphot/ with the appropriate psfs under the detector heading. Once you have unpacked the PSF tar file, move the psfs in a step like this for all revlevant filters you will use:
+Now we can proceed to running the multi-pass photometry step. However, we must ensure we have the proper PSFs for dolphot to read to do PSF photometry. We downloaded the psfs again from http://americano.dolphinsim.com/dolphot/ with the appropriate psfs under the detector heading. Once you have unpacked the PSF tar file, move the psfs in a step like this for all revlevant filters you will use:
 ```
 mv ~/F150W.*.psf ~/dolphot2.0/nircam/data
 ```
-Now, we can run dolphot, but we must set key parameters in the dolphot.param file(contained in the param subdirectory, but this should be moved to the directory you run photometry from with all relevant files). The recommended parameters are laid out in the manual, and there are many choices one can make. The first ap-rt fo the parameter file specifices the number of science images one wants to do photometry as well as potentially adding a reference(drizzled) image. We have one image for this example, so this is simple
+Now, we can run dolphot, but we must set key parameters in the dolphot.param file(contained in the param subdirectory, but this should be moved to the directory you run photometry from with all relevant files). The recommended parameters are laid out in the manual, and there are many choices one can make. The first part of the parameter file specifices the number of science images one wants to do photometry pn as well as potentially adding a reference(drizzled) image. We have one image for this example, so this is simple
 ```
 more dolphot.param
 Nimg = 1                #number of images (int)
@@ -67,7 +70,7 @@ img_aprad = 20          #radius for aperture correction
 img_apsky = 30 50       #sky annulus for aperture correction
 #
 ```
-The comments on the side provide the defintion of each parameter one can choose. Preferred parameters are laid out in each detector's manual. Other parameters in the file are used for finding and measuring stars. DOlphot will run across the entire image, so this is why it is generally used for multi-siource imaging. Of course it can still be used for a single source, but it may take longer than other single-source algorithms.
+The comments on the side provide the defintion of each parameter one can choose. Preferred parameters are laid out in each detector's manual. Other parameters in the file are used for finding and measuring stars. Dolphot will run across the entire image, so this is why it is generally used for multi-siource imaging. Of course it can still be used for a single source, but it may take longer than other single-source algorithms.
 ```
 photsec =               #section: group, chip, (X,Y)0, (X,Y)1
 RCentroid = 2           #centroid box size (int>0)
@@ -95,8 +98,8 @@ SigPSF = 5.0             #min S/N for psf parameter fits (flt)
 #MaxE = 0.5              #maximum ellipticity for good star (flt)
 #
 ```
-After changing all relevant parameters and setting up the PSF, we can run the true photeomtry dolphot step.
+After changing all relevant parameters and setting up the PSFs, we can run the photometry step using the dolphot command and specifying the relevant parameter file.
 ```
 dolphot 2022riv_f150w.phot -pdolphot.param
 ```
-The filename can bet set by you. This will create a photometry file with many columns. Luckily, running dolphot creates a variety of files which give the column names(2022riv_f150w.phot.columns) and explain the output. In essense, the output file will contain x and y positions of the detections as well as Vega mangitudes. In order to pinpoint what the output for your source is, a bit of additional care is required. One must use the RA/DEC of the source to fin d detections within some small(5-10 pixel) radius around your source. there may be 3-4 detections, but using the following notebook(which has a SN as it's desired source) one can overlay the detections onto the image and tell which magnitude corresponds to the source itself and not some nearby object. Here is an example for SN 2022riv which can be easily duplicated: [Parsing dolphot output](https://github.com/18rway/dolphot/blob/main/Reading_dolphot.ipynb)
+The filename can bet set by you. This will create a photometry file with many columns. Running dolphot creates a variety of files which explain the column names(2022riv_f150w.phot.columns) and explain the output. In essense, the output file will contain x and y positions of the detections as well as Vega mangitudes. In order to pinpoint what the output for your source is, a bit of additional care is required. One must use the RA/DEC of the source to find detections within some small(5-10 pixel) radius around your source. there may be 3-4 detections, but using the following notebook(which has a SN as it's desired source) one can overlay the detections onto the image and tell which magnitude corresponds to the source itself and not some nearby object. Here is an example for SN 2022riv which can be easily duplicated: [Parsing dolphot output](https://github.com/18rway/dolphot/blob/main/Reading_dolphot.ipynb)
