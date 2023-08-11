@@ -13,7 +13,7 @@ Now, that everything is downloaded, you can set the path so that one can properl
 ```
 export PATH=~/dolphot2.0/bin:$PATH
 ```
-Now you can begin to work with dolphot. The great advantage of dolphot is that you can run across many images simaultaneously, and dolphot will treat each image separately and give separate results. However, for this example, let us simply assume we are using a single calibrated(level 2) image. Adding images simply requires a tweak to the parameter file. Download images from: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
+Now you can begin to work with dolphot. The great advantage of dolphot is that you can run across many images simultaneously, and dolphot will treat each image separately and give separate results. However, for this example, let us simply assume we are using a single calibrated(level 2) image. Adding images simply requires a tweak to the parameter file. Download images from: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
 Once you have your images downloaded, you must run the appropriate masking step, which masks pixels or converts them to a usable format for dolphot, depending on the detector. For this step, if one was working with a nircam image which we assume is in some directory on our computer, you would run:
 ```
 ls
@@ -36,7 +36,7 @@ Now, we must create a sky map for dolphot to use for each image and each chip. T
 - sigmalow = 2.25
 - sigmahigh = 2.00
 
-The manual outlines what exactly each of these parameters does, but essentially dolphot will create a sky map based on an annuus between rin and rout pixels from the pixel whose value is being measured, going in steps based on the step parameter.The algorithm is a mean with iterative rejection. Each iteration, the mean and standard deviation are calculated, and values falling more than σlow below or σhigh above
+The manual outlines what exactly each of these parameters does, but essentially dolphot will create a sky map based on an annulus between rin and rout pixels from the pixel whose value is being measured, going in steps based on the step parameter.s Each iteration, the mean and standard deviation are calculated, and values falling more than σlow below or σhigh above
 the mean are rejected. This procedure continues until no pixels are rejected.
 ```
 calcsky
@@ -67,10 +67,11 @@ img_RChi = -1           #Aperture for determining centroiding (flt); if <=0 use 
 img_RSky = 4 10         #radii defining sky annulus (flt>=RAper+0.5)
 img_RPSF = 13           #PSF size (int>0)
 img_aprad = 20          #radius for aperture correction
-img_apsky = 30 50       #sky annulus for aperture correction
+img_apsky = 30 50#sky annulus for aperture correction
+photsec= 0 1 490 490 510 510      #region to do photometry on
 #
 ```
-The comments on the side provide the defintion of each parameter one can choose. Preferred parameters are laid out in each detector's manual. Other parameters in the file are used for finding and measuring stars. Dolphot will run across the entire image, so this is why it is generally used for multi-siource imaging. Of course it can still be used for a single source, but it may take longer than other single-source algorithms.
+The most important parameter to set here(for individual objects) is photsec, which can determine how much of an image you photometer. To determine how much of the image to photometer, simply find the ra/dec of the object and convert it to pixrel values using astropy( first step here https://github.com/18rway/dolphot/blob/main/Reading_dolphot.ipynb) or use ds9 for a rough estimate of the pixel value. Photometer a region that is +/- 20 of the given x and y you find to be safe. So, if the location was (500,500), you would enter photsec= 0 1 490 490 510 510 and dolphot would only do photometry on detections in this region. For an image where you are interested in a variety of objects, this step is not necesarry The comments on the side provide the defintion of each parameter one can choose. Preferred parameters are laid out in each detector's manual. Other parameters in the file are used for finding and measuring stars.  Of course it can still be used for a single source, but it may take longer than other single-source algorithms.
 ```
 photsec =               #section: group, chip, (X,Y)0, (X,Y)1
 RCentroid = 2           #centroid box size (int>0)
