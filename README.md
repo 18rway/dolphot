@@ -1,5 +1,5 @@
 # dolphot
-This readme will outline the necessary steps to run dolphot for JWST images with any detector. All steps should be run in the terminal.
+This readme will outline the necessary steps to run dolphot for JWST images with any detector on a Mac OS operating system. Transferring these steps to Windows/Linux should be relatively straightforward. All steps should be run in the terminal.
 First, begin by downloading dolphot: http://americano.dolphinsim.com/dolphot/
 
 Download the dolphot2.0 base sources, and then download the MIRI,NIRCAM and NIRISS software. The downloads will contains manuals which outline many of the steps I will go through here. Once all the tar files are downloaded and unpacked, place all 3 detector subdirectories into the dolphot2.0 overall directory using, for example:
@@ -9,11 +9,11 @@ mv ~/dolphot2.0_2/miri ~/dolphot2.0
 Ensure all subdirectories for the detectors are in the larger dolphot directory.
 Uncomment all 3 definitions for MIRI,NIRCAM and NIRISS in the makefile by simply opening it and using a preferred text editor.
 Now, run the make file from the dolphot2.0 subdirectory simply by running make. Everything should run without errors. If something fails, check the manual or reach out to Andy Dolphin(he is quite responsive) at adolphin@raytheon.com
-Now, that everything is downloaded, you can set the path so that one can properly run dolphot from the terminal. Edit your bashrc file to contain the following:
+Now, that everything is downloaded, you can set the path so that one can properly run dolphot from the terminal. If you are using a bourne shell(sh,ash,bash,zsh), edit your bashrc file to contain the following:
 ```
 export PATH=~/dolphot2.0/bin:$PATH
 ```
-Now you can begin to work with dolphot. The great advantage of dolphot is that you can run across many images simultaneously, and dolphot will treat each image separately and give separate results. However, for this example, let us simply assume we are using a single calibrated(level 2) image. Adding images simply requires a tweak to the parameter file. Download images from: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
+If you are using a C shell variant instead, run the equivalent setenv command. Now you can begin to work with dolphot. The great advantage of dolphot is that you can run across many images simultaneously, and dolphot will treat each image separately and give separate results. However, for this example, let us simply assume we are using a single calibrated(level 2) image. Adding images simply requires a tweak to the parameter file. Download images from: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
 Once you have your images downloaded, you must run the appropriate masking step, which masks pixels or converts them to a usable format for dolphot, depending on the detector. For this step, if one was working with a nircam image which we assume is in some directory on our computer, you would run:
 ```
 ls
