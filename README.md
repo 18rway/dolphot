@@ -1,27 +1,29 @@
-# dolphot
-This readme will outline the necessary steps to run dolphot for JWST images with any detector on a Mac OS operating system. Transferring these steps to Windows/Linux should be relatively straightforward. All steps should be run in the terminal.
+# DOLPHOT TUTORIAL 
+This readme will outline the necessary steps to run dolphot for JWST images with any detector. All steps should be run in the terminal.
+
 First, begin by downloading dolphot: http://americano.dolphinsim.com/dolphot/
 
-Download the dolphot2.0 base sources, and then download the MIRI,NIRCAM and NIRISS software. The downloads will contains manuals which outline many of the steps I will go through here. Once all the tar files are downloaded and unpacked, place all 3 detector subdirectories into the dolphot2.0 overall directory using, for example:
+Download the dolphot2.0 base sources, and then download the MIRI,NIRCAM and NIRISS sources(they are further down the webpage). The downloads will contain manuals which outline many of the steps I will go through here. Once all the tar files are downloaded and unpacked(using tar -xzvf or equivalent), place all 3 detector subdirectories into the dolphot2.0 parent directory using, for example:
+
 ```
 mv ~/dolphot2.0_2/miri ~/dolphot2.0
 ```
 Ensure all subdirectories for the detectors are in the larger dolphot directory.
-Uncomment all 3 definitions for MIRI,NIRCAM and NIRISS in the makefile by simply opening it and using a preferred text editor.
-Now, run the make file from the dolphot2.0 subdirectory simply by running make. Everything should run without errors. If something fails, check the manual or reach out to Andy Dolphin(he is quite responsive) at adolphin@raytheon.com
+Uncomment all 3 definitions for MIRI,NIRCAM and NIRISS in the makefile by simply opening it and using a preferred text editor and removing the #.
+Now, run the makefile from the `dolphot2.0` subdirectory simply by running make. Everything should run without errors. If something fails, check the manual or reach out to Andy Dolphin (he is usually quite responsive) at adolphin@raytheon.com
+
 Now, that everything is downloaded, you can set the path so that one can properly run dolphot from the terminal. If you are using a bourne shell(sh,ash,bash,zsh), edit your bashrc file to contain the following:
 ```
 export PATH=~/dolphot2.0/bin:$PATH
 ```
-If you are using a C shell variant instead, run the equivalent setenv command. Now you can begin to work with dolphot. The great advantage of dolphot is that you can run across many images simultaneously, and dolphot will treat each image separately and give separate results. However, for this example, let us simply assume we are using a single calibrated(level 2) image. Adding images simply requires a tweak to the parameter file. Download images from: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
-Once you have your images downloaded, you must run the appropriate masking step, which masks pixels or converts them to a usable format for dolphot, depending on the detector. For this step, if one was working with a nircam image which we assume is in some directory on our computer, you would run:
+If you are using a C shell variant instead, run the equivalent setenv command. Now you can begin to work with dolphot. The great advantage of dolphot is that you can run across many images simultaneously, and dolphot will treat each image separately and give separate results. However, for this example, let us simply assume we are using a single calibrated(level 2 _cal) image. Adding images simply requires a tweak to the parameter file. Download images from: https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html
+Once you have your images downloaded, you must run the appropriate masking step, which masks pixels or converts them to a usable format for dolphot, depending on the detector. Ensure you make a copy of the image, as the masking step alters the image. This step will mask the image and then create a log file to keep track of any potential errors in the ouput and your progress. For this step, if one was working with a NIRCAM image which we assume is in some directory on our computer, you would run:
 ```
 ls
 jw02767002001_02103_00001_nrcb3_cal.fits
 nircammask *.fits >>phot.log
 ```
-Ensure you make a copy of the image, as the masking step alters the image. This step will mask the image and then create a log file to keep track of any potential errors in the ouput and your progress.
-Following this, it is best practice to ensure that there is only one science chip you will be running dolphot on(dolphot will not run on multi-chip images-you need to separate and run on each chip) by running splitgroups
+Following this, it is best practice to ensure that there is only one science extension(or image chip) you will be running dolphot on(dolphot will not run on multi-chip images-you need to separate and run on each chip) by running splitgroups
 ```
 splitgroups *.fits >>phot.log
 ls
@@ -36,7 +38,7 @@ Now, we must create a sky map for dolphot to use for each image and each chip. T
 - sigmalow = 2.25
 - sigmahigh = 2.00
 
-The manual outlines what exactly each of these parameters does, but essentially dolphot will create a sky map based on an annulus between rin and rout pixels from the pixel whose value is being measured, going in steps based on the step parameter.s Each iteration, the mean and standard deviation are calculated, and values falling more than σlow below or σhigh above
+The manual outlines what exactly each of these parameters does, but essentially dolphot will create a sky map based on an annulus between rin and rout pixels from the pixel whose value is being measured, going in steps based on the step parameter. Each iteration, the mean and standard deviation are calculated, and values falling more than σlow below or σhigh above
 the mean are rejected. This procedure continues until no pixels are rejected.
 ```
 calcsky
@@ -49,7 +51,7 @@ Now we can proceed to running the multi-pass photometry step. However, we must e
 ```
 mv ~/F150W.*.psf ~/dolphot2.0/nircam/data
 ```
-Now, we can run dolphot, but we must set key parameters in the dolphot.param file(contained in the param subdirectory, but this should be moved to the directory you run photometry from with all relevant files). The recommended parameters are laid out in the manual, and there are many choices one can make. The first part of the parameter file specifices the number of science images one wants to do photometry on as well as potentially adding a reference(drizzled) image. We have one image for this example, so this is simple
+Now, we can run dolphot, but we must set key parameters in the dolphot.param file(an original copy is contained in the param subdirectory, but this should be moved to the directory you run photometry from). The recommended parameters are laid out in the manual, and there are many choices one can make. The first part of the parameter file specifies the number of science images one wants to do photometry on as well as potentially adding a reference(drizzled) image. We have one image for this example, so this is simple
 ```
 more dolphot.param
 Nimg = 1                #number of images (int)
@@ -71,7 +73,7 @@ img_apsky = 30 50#sky annulus for aperture correction
 photsec= 0 1 490 490 510 510      #region to do photometry on
 #
 ```
-The most important parameter to set here(for individual objects) is photsec, which can determine how much of an image you photometer. To determine how much of the image to photometer, simply find the ra/dec of the object and convert it to pixrel values using astropy( first step here https://github.com/18rway/dolphot/blob/main/Reading_dolphot.ipynb) or use ds9 for a rough estimate of the pixel value. Photometer a region that is +/- 20 of the given x and y you find to be safe. So, if the location was (500,500), you would enter photsec= 0 1 490 490 510 510 and dolphot would only do photometry on detections in this region. For an image where you are interested in a variety of objects, this step is not necesarry The comments on the side provide the defintion of each parameter one can choose. Preferred parameters are laid out in each detector's manual. Other parameters in the file are used for finding and measuring stars.  Of course it can still be used for a single source, but it may take longer than other single-source algorithms.
+The most important parameter to set here(for individual objects) is photsec, which can determine how much of an image you photometer. To determine how much of the image to photometer, simply find the ra/dec of the object and convert it to pixrel values using astropy( first step here https://github.com/18rway/dolphot/blob/main/Reading_dolphot.ipynb) or use ds9 for a rough estimate of the pixel value. Photometer a region that is +/- 20 of the given x and y you find to be safe. So, if the location was (500,500), you would enter photsec= 0 1 490 490 510 510 and dolphot would only do photometry on detections in this region. For an image where you are interested in a variety of objects, this step is not necesarry. The comments on the side provide the defintion of each parameter one can choose. Preferred parameters are laid out in each detector's manual. Other parameters in the file are used for finding and measuring stars.  Of course it can still be used for a single source, but it may take longer than other single-source algorithms.
 ```
 photsec =               #section: group, chip, (X,Y)0, (X,Y)1
 RCentroid = 2           #centroid box size (int>0)
