@@ -47,11 +47,11 @@ calcsky jw02767002001_02103_00001_nrcb3_cal 10 25 4 2.25 2.00 >>phot.log
 ls
 jw02767002001_02103_00001_nrcb3_cal.fits jw02767002001_02103_00001_nrcb3_cal.chip1.fits jw02767002001_02103_00001_nrcb3_cal.chip1.sky.fits
 ```
-Now we can proceed to running the multi-pass photometry step. However, we must ensure we have the proper PSFs for dolphot to read to do PSF photometry. We downloaded the psfs again from http://americano.dolphinsim.com/dolphot/ with the appropriate psfs under the detector heading. Once you have unpacked the PSF tar file, move the psfs in a step like this for all revlevant filters you will use:
+Now we can proceed to running the multi-pass photometry step. However, we must ensure we have the proper PSFs for dolphot to read to do PSF photometry. We downloaded the psfs again from http://americano.dolphinsim.com/dolphot/ with the appropriate psfs under the detector heading. Once you have unpacked the PSF tar file, move the psfs to the parent directory for all relevant filters you will use:
 ```
 mv ~/F150W.*.psf ~/dolphot2.0/nircam/data
 ```
-Now, we can run dolphot, but we must set key parameters in the dolphot.param file(an original copy is contained in the param subdirectory, but this should be moved to the directory you run photometry from). The recommended parameters are laid out in the manual, and there are many choices one can make. The first part of the parameter file specifies the number of science images one wants to do photometry on as well as potentially adding a reference(drizzled) image. We have one image for this example, so this is simple
+Now, we can run dolphot, but we must set key parameters in the dolphot.param file(a copy of this file which you can edit is in this repository-place this in the folder you run dolphot from). The recommended parameters are laid out in the manual, and there are many choices one can make. The first part of the parameter file specifies the number of science images one wants to do photometry on as well as potentially adding a reference(drizzled) image. We have one image for this example, so this is simple
 ```
 more dolphot.param
 Nimg = 1                #number of images (int)
