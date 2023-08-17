@@ -51,7 +51,7 @@ Now we can proceed to running the multi-pass photometry step. However, we must e
 ```
 mv ~/F150W.*.psf ~/dolphot2.0/nircam/data
 ```
-Now, we can run dolphot, but we must set key parameters in the dolphot.param file(a copy of this file which you can edit is in this repository-place this in the folder you run dolphot from). The recommended parameters are laid out in the manual, and there are many choices one can make. The first part of the parameter file specifies the number of science images one wants to do photometry on as well as potentially adding a reference(drizzled) image. We have one image for this example, so this is simple
+Now, we can run dolphot, but we must set key parameters in the dolphot.param file(a copy of this file(with MIRI and NIRCAM specifications which you can edit is in this repository-place this in the folder you run dolphot from). The recommended parameters are laid out in the manual, and there are many choices one can make. The first part of the parameter file specifies the number of science images one wants to do photometry on as well as potentially adding a reference(drizzled) image. We have one image for this example, so this is simple
 ```
 more dolphot.param
 Nimg = 1                #number of images (int)
