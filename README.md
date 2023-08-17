@@ -9,7 +9,7 @@ Download the dolphot2.0 base sources, and then download the MIRI,NIRCAM and NIRI
 mv ~/dolphot2.0_2/miri ~/dolphot2.0
 ```
 Ensure all subdirectories for the detectors are in the larger dolphot directory.
-Uncomment all 3 definitions for MIRI,NIRCAM and NIRISS in the makefile by simply opening it and using a preferred text editor and removing the #.
+Uncomment all 3 definitions for MIRI,NIRCAM and NIRISS(uncomment "export USEMIRI=1" as well as any other edits you need for example) in the makefile by simply opening it and using a preferred text editor and removing the #.
 Now, run the makefile from the `dolphot2.0` subdirectory simply by running make. Everything should run without errors. If something fails, check the manual or reach out to Andy Dolphin (he is usually quite responsive) at adolphin@raytheon.com
 
 Now, that everything is downloaded, you can set the path so that one can properly run dolphot from the terminal. If you are using a bourne shell(sh,ash,bash,zsh), edit your bashrc file to contain the following:
